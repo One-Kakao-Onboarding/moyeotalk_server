@@ -4,3 +4,7 @@ export * from './Textarea';
 export * from './Chip';
 export * from './ProfileAvatar';
 export * from './RecommendationCard';
+export * from './RouteCard';
+export * from './RouteSlider';
+export * from './LocationSearchModal';
+export * from './DateRangePicker';

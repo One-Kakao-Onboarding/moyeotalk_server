@@ -24,7 +24,7 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({ isOpen, onClose }) => 
 
   const handleSubmit = () => {
     if (!validateStep2()) {
-      alert('분위기와 활동을 선택해주세요!');
+      alert('희망 장소 수, 분위기, 활동을 모두 선택해주세요!');
       return;
     }
 

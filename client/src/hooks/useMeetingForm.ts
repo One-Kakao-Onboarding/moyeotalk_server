@@ -6,6 +6,7 @@ export const useMeetingForm = () => {
     departure: '',
     destination: '',
     when: '',
+    placeCount: '',
     mood: '',
     activity: '',
     additional: '',
@@ -34,7 +35,7 @@ export const useMeetingForm = () => {
   };
 
   const validateStep2 = (): boolean => {
-    return !!(formData.mood && formData.activity);
+    return !!(formData.placeCount && formData.mood && formData.activity);
   };
 
   const resetForm = () => {
@@ -42,6 +43,7 @@ export const useMeetingForm = () => {
       departure: '',
       destination: '',
       when: '',
+      placeCount: '',
       mood: '',
       activity: '',
       additional: '',

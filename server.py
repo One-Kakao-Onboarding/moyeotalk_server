@@ -115,18 +115,20 @@ async def get_place_recommendation(chat_history: List[dict], usernames: List[str
             departure = meeting_data.get('departure', '미입력')
             destination = meeting_data.get('destination', '미입력')
             when = meeting_data.get('when', '미입력')
+            place_count = meeting_data.get('placeCount', '2곳')
             mood = meeting_data.get('mood', '미입력')
             activity = meeting_data.get('activity', '미입력')
             additional = meeting_data.get('additional', '없음')
 
             prompt = f"""
-당신은 'Kanana' AI 약속 어시스턴트입니다. 친구들의 만남을 위한 최적의 장소를 추천합니다.
+당신은 'Kanana' AI 약속 어시스턴트입니다. 친구들의 만남을 위한 최적의 경로를 추천합니다.
 
 [참여자 정보]
 - 참여자: {participants}
 - 출발 지점: {departure}
 - 만나고 싶은 곳: {destination}
 - 만나는 시간: {when}
+- 희망 장소 수: {place_count}
 - 원하는 분위기: {mood}
 - 하고 싶은 활동: {activity}
 - 추가 고려사항: {additional}
@@ -134,12 +136,58 @@ async def get_place_recommendation(chat_history: List[dict], usernames: List[str
 [대화 내용]
 {chat_context}
 
-위 정보를 종합하여 최적의 만남 장소 3곳을 추천해주세요:
-1. 장소명과 위치 (구체적으로)
-2. 해당 장소가 적합한 이유 (출발 지점, 분위기, 활동 등을 고려)
-3. 추천 시간대나 예약 팁 (있다면)
+위 정보를 바탕으로 3가지 다른 경로(Route)를 추천해주세요. 각 경로는 희망 장소 수({place_count})를 고려하여 2-3개의 장소로 구성됩니다.
+반드시 아래 JSON 형식으로만 답변해주세요:
 
-답변은 친근하고 캐주얼한 카카오톡 말투로 작성해주세요. 이모지도 적절히 사용해주세요!
+```json
+{{
+  "routes": [
+    {{
+      "routeId": 1,
+      "title": "첫 번째 경로 제목",
+      "totalTime": "2시간 30분",
+      "places": [
+        {{
+          "order": 1,
+          "name": "장소명",
+          "location": "구체적인 주소",
+          "travelTime": "15분",
+          "reason": "추천 이유",
+          "emoji": "🍽️"
+        }},
+        {{
+          "order": 2,
+          "name": "두 번째 장소명",
+          "location": "구체적인 주소",
+          "travelTime": "20분",
+          "reason": "추천 이유",
+          "emoji": "☕"
+        }}
+      ]
+    }},
+    {{
+      "routeId": 2,
+      "title": "두 번째 경로 제목",
+      "totalTime": "3시간",
+      "places": [...]
+    }},
+    {{
+      "routeId": 3,
+      "title": "세 번째 경로 제목",
+      "totalTime": "2시간",
+      "places": [...]
+    }}
+  ]
+}}
+```
+
+중요:
+- 각 경로는 출발지({departure})에서 시작합니다
+- travelTime은 이전 장소에서 해당 장소까지의 대중교통/도보 소요 시간입니다
+- 첫 번째 장소의 travelTime은 출발지에서의 소요 시간입니다
+- 분위기({mood})와 활동({activity})을 고려하여 장소를 선택해주세요
+- 실제 존재하는 장소로 추천해주세요
+- JSON 외의 다른 텍스트는 포함하지 마세요
 """
         else:
             prompt = f"""
