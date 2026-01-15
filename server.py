@@ -115,9 +115,9 @@ async def get_place_recommendation(chat_history: List[dict], usernames: List[str
             departure = meeting_data.get('departure', '미입력')
             destination = meeting_data.get('destination', '미입력')
             when = meeting_data.get('when', '미입력')
-            place_count = meeting_data.get('placeCount', '2곳')
-            mood = meeting_data.get('mood', '미입력')
-            activity = meeting_data.get('activity', '미입력')
+            foods = ', '.join(meeting_data.get('foods', [])) or '미입력'
+            moods = ', '.join(meeting_data.get('moods', [])) or '미입력'
+            facilities = ', '.join(meeting_data.get('facilities', [])) or '미입력'
             additional = meeting_data.get('additional', '없음')
 
             prompt = f"""
@@ -128,15 +128,15 @@ async def get_place_recommendation(chat_history: List[dict], usernames: List[str
 - 출발 지점: {departure}
 - 만나고 싶은 곳: {destination}
 - 만나는 시간: {when}
-- 희망 장소 수: {place_count}
-- 원하는 분위기: {mood}
-- 하고 싶은 활동: {activity}
+- 먹고 싶은 것: {foods}
+- 원하는 분위기: {moods}
+- 필요한 편의시설: {facilities}
 - 추가 고려사항: {additional}
 
 [대화 내용]
 {chat_context}
 
-위 정보를 바탕으로 3가지 다른 경로(Route)를 추천해주세요. 각 경로는 희망 장소 수({place_count})를 고려하여 2-3개의 장소로 구성됩니다.
+위 정보를 바탕으로 3가지 다른 경로(Route)를 추천해주세요. 각 경로는 2-3개의 장소로 구성됩니다.
 반드시 아래 JSON 형식으로만 답변해주세요:
 
 ```json
@@ -151,16 +151,20 @@ async def get_place_recommendation(chat_history: List[dict], usernames: List[str
           "order": 1,
           "name": "장소명",
           "location": "구체적인 주소",
+          "category": "중식",
+          "distance": "여기서 3.7km",
           "travelTime": "15분",
-          "reason": "추천 이유",
+          "reason": "추천 이유 (구체적이고 상세하게)",
           "emoji": "🍽️"
         }},
         {{
           "order": 2,
           "name": "두 번째 장소명",
           "location": "구체적인 주소",
+          "category": "카페",
+          "distance": "여기서 500m",
           "travelTime": "20분",
-          "reason": "추천 이유",
+          "reason": "추천 이유 (구체적이고 상세하게)",
           "emoji": "☕"
         }}
       ]
@@ -185,7 +189,10 @@ async def get_place_recommendation(chat_history: List[dict], usernames: List[str
 - 각 경로는 출발지({departure})에서 시작합니다
 - travelTime은 이전 장소에서 해당 장소까지의 대중교통/도보 소요 시간입니다
 - 첫 번째 장소의 travelTime은 출발지에서의 소요 시간입니다
-- 분위기({mood})와 활동({activity})을 고려하여 장소를 선택해주세요
+- category는 장소 카테고리 (예: "중식", "카페", "술집", "일식")
+- distance는 출발지로부터의 거리 (예: "여기서 3.7km", "여기서 500m")
+- reason은 카나나가 해당 장소를 추천하는 구체적인 이유 (2-3문장으로 상세하게)
+- 먹고 싶은 것({foods}), 분위기({moods}), 편의시설({facilities})을 모두 고려하여 장소를 선택해주세요
 - 실제 존재하는 장소로 추천해주세요
 - JSON 외의 다른 텍스트는 포함하지 마세요
 """

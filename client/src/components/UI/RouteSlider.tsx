@@ -5,20 +5,32 @@ import { RouteCard } from './RouteCard';
 interface RouteSliderProps {
   routes: Route[];
   onAccept: (route: Route) => void;
+  onReject?: (route: Route) => void;
+  meetingData?: {
+    when: string;
+    destination: string;
+  };
 }
 
-export const RouteSlider: React.FC<RouteSliderProps> = ({ routes, onAccept }) => {
+export const RouteSlider: React.FC<RouteSliderProps> = ({ routes, onAccept, onReject, meetingData }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const sliderRef = useRef<HTMLDivElement>(null);
+
+  const handleReject = (route: Route) => {
+    if (onReject) {
+      onReject(route);
+    }
+  };
 
   const handleScroll = () => {
     if (!sliderRef.current) return;
 
     const scrollLeft = sliderRef.current.scrollLeft;
-    const cardWidth = sliderRef.current.offsetWidth;
+    const containerWidth = sliderRef.current.offsetWidth;
+    const cardWidth = containerWidth * 0.92 + 16; // 92% + gap
     const newIndex = Math.round(scrollLeft / cardWidth);
 
-    if (newIndex !== currentIndex) {
+    if (newIndex !== currentIndex && newIndex >= 0 && newIndex < routes.length) {
       setCurrentIndex(newIndex);
     }
   };
@@ -26,7 +38,8 @@ export const RouteSlider: React.FC<RouteSliderProps> = ({ routes, onAccept }) =>
   const scrollToIndex = (index: number) => {
     if (!sliderRef.current) return;
 
-    const cardWidth = sliderRef.current.offsetWidth;
+    const containerWidth = sliderRef.current.offsetWidth;
+    const cardWidth = containerWidth * 0.92 + 16; // 92% + gap
     sliderRef.current.scrollTo({
       left: cardWidth * index,
       behavior: 'smooth',
@@ -43,7 +56,7 @@ export const RouteSlider: React.FC<RouteSliderProps> = ({ routes, onAccept }) =>
   }
 
   return (
-    <div className="w-full">
+    <div className="w-full -mx-4">
       {/* Slider Container */}
       <div
         ref={sliderRef}
@@ -52,11 +65,20 @@ export const RouteSlider: React.FC<RouteSliderProps> = ({ routes, onAccept }) =>
         style={{
           scrollbarWidth: 'none',
           msOverflowStyle: 'none',
+          paddingLeft: '4%',
+          paddingRight: '4%',
         }}
       >
-        {routes.map((route) => (
-          <div key={route.routeId} className="flex-shrink-0 w-full snap-center">
-            <RouteCard route={route} onAccept={onAccept} />
+        {routes.map((route, index) => (
+          <div
+            key={route.routeId}
+            className="flex-shrink-0 w-[92%] snap-center animate-slide-up"
+            style={{
+              animationDelay: `${index * 150}ms`,
+              animationFillMode: 'both',
+            }}
+          >
+            <RouteCard route={route} onAccept={onAccept} onReject={handleReject} meetingData={meetingData} />
           </div>
         ))}
       </div>

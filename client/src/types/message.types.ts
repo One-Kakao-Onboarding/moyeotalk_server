@@ -4,7 +4,8 @@ export type MessageType =
   | 'bot_trigger'
   | 'bot_loading'
   | 'bot_recommendation'
-  | 'request_recommendation';
+  | 'request_recommendation'
+  | 'appointment_confirmed';
 
 export interface BaseMessage {
   type: MessageType;
@@ -37,6 +38,14 @@ export interface BotRecommendationMessage extends BaseMessage {
   username: 'Kanana';
 }
 
+export interface AppointmentConfirmedMessage extends BaseMessage {
+  type: 'appointment_confirmed';
+  username: 'Kanana';
+  route: import('./meeting.types').Route;
+  meetingData: import('./meeting.types').MeetingData;
+  participants: string[];
+}
+
 export interface RequestRecommendationMessage {
   type: 'request_recommendation';
   username: string;
@@ -48,6 +57,7 @@ export type Message =
   | SystemMessage
   | BotTriggerMessage
   | BotLoadingMessage
-  | BotRecommendationMessage;
+  | BotRecommendationMessage
+  | AppointmentConfirmedMessage;
 
 export type WebSocketMessage = Message | RequestRecommendationMessage;

@@ -8,6 +8,7 @@ import {
   BotTriggerMessage,
   BotLoadingMessage,
   BotRecommendationMessage,
+  AppointmentConfirmedMessage,
 } from './Message';
 
 interface MessageListProps {
@@ -52,6 +53,9 @@ export const MessageList: React.FC<MessageListProps> = ({ onRequestRecommendatio
 
       case 'bot_recommendation':
         return <BotRecommendationMessage key={index} message={message} />;
+
+      case 'appointment_confirmed':
+        return <AppointmentConfirmedMessage key={index} message={message} />;
 
       default:
         return null;

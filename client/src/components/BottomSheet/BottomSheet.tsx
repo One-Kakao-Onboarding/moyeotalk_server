@@ -11,7 +11,7 @@ interface BottomSheetProps {
 }
 
 export const BottomSheet: React.FC<BottomSheetProps> = ({ isOpen, onClose }) => {
-  const { formData, currentStep, updateField, goToStep2, validateStep2, resetForm } =
+  const { formData, currentStep, updateField, updateArrayField, goToStep2, validateStep2, resetForm } =
     useMeetingForm();
   const { requestRecommendation } = useChatContext();
 
@@ -24,7 +24,7 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({ isOpen, onClose }) => 
 
   const handleSubmit = () => {
     if (!validateStep2()) {
-      alert('희망 장소 수, 분위기, 활동을 모두 선택해주세요!');
+      alert('최소 하나 이상의 항목을 선택해주세요!');
       return;
     }
 
@@ -37,7 +37,7 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({ isOpen, onClose }) => 
     onClose();
   };
 
-  const stepTitle = currentStep === 1 ? '언제, 어디서 만날까요?' : '어떤 만남이 되면 좋겠어요?';
+  const stepTitle = currentStep === 1 ? '언제, 어디서 만날까요?' : '어떤 만남이\n되면 좋겠어요?';
 
   return (
     <>
@@ -60,7 +60,12 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({ isOpen, onClose }) => 
           {currentStep === 1 ? (
             <MeetingFormStep1 formData={formData} onChange={updateField} onNext={handleNext} />
           ) : (
-            <MeetingFormStep2 formData={formData} onChange={updateField} onSubmit={handleSubmit} />
+            <MeetingFormStep2
+              formData={formData}
+              onChangeArray={updateArrayField}
+              onChange={updateField}
+              onSubmit={handleSubmit}
+            />
           )}
         </div>
       </div>

@@ -1,6 +1,6 @@
 import React, { createContext, useContext, ReactNode, useMemo } from 'react';
 import { useChat } from '@hooks/useChat';
-import type { Message, MeetingData } from '@app-types';
+import type { Message, MeetingData, Route } from '@app-types';
 
 interface ChatContextType {
   messages: Message[];
@@ -10,6 +10,8 @@ interface ChatContextType {
   connect: (username: string) => void;
   sendMessage: (content: string) => void;
   requestRecommendation: (meetingData: MeetingData) => void;
+  confirmAppointment: (route: Route, meetingData: MeetingData, participants: string[]) => void;
+  currentMeetingData: MeetingData | null;
 }
 
 const ChatContext = createContext<ChatContextType | undefined>(undefined);
@@ -31,6 +33,8 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children, username }
       connect: chat.connect,
       sendMessage: chat.sendMessage,
       requestRecommendation: chat.requestRecommendation,
+      confirmAppointment: chat.confirmAppointment,
+      currentMeetingData: chat.currentMeetingData,
     }),
     [
       chat.messages,
@@ -40,6 +44,8 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children, username }
       chat.connect,
       chat.sendMessage,
       chat.requestRecommendation,
+      chat.confirmAppointment,
+      chat.currentMeetingData,
     ]
   );
 

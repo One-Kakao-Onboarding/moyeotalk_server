@@ -2,7 +2,7 @@ import type { ChipOption } from '@app-types/meeting.types';
 
 // 출발하는 곳 옵션
 export const DEPARTURE_OPTIONS: ChipOption[] = [
-  { value: '최근 방문', label: '최근 방문' },
+  { value: '내 주변', label: '내 주변' },
   { value: '집', label: '집' },
   { value: '학교', label: '학교' },
   { value: '회사', label: '회사' },
@@ -10,39 +10,33 @@ export const DEPARTURE_OPTIONS: ChipOption[] = [
 
 // 만나고 싶은 곳 옵션
 export const DESTINATION_OPTIONS: ChipOption[] = [
-  { value: '강남', label: '강남' },
-  { value: '신촌', label: '신촌' },
-  { value: '홍대', label: '홍대' },
-  { value: '이태원', label: '이태원' },
-  { value: '명동', label: '명동' },
-  { value: '건대', label: '건대' },
+  { value: '현위치와 가까운 곳', label: '현위치와 가까운 곳' },
+  { value: '한강진역', label: '한강진역' },
+  { value: '성수역', label: '성수역' },
 ];
 
-// 희망 장소 수
-export const PLACE_COUNT_OPTIONS: ChipOption[] = [
-  { value: '2곳', label: '2곳' },
-  { value: '3곳 이상', label: '3곳 이상' },
-  { value: '모름', label: '모름' },
+// 먹고 싶은 것
+export const FOOD_OPTIONS: ChipOption[] = [
+  { value: '속 편한 음식', label: '속 편한 음식' },
+  { value: '매운 음식', label: '매운 음식' },
+  { value: '두툼푸', label: '두툼푸' },
+  { value: '와인', label: '와인' },
 ];
 
-// 원하는 분위기
+// 분위기
 export const MOOD_OPTIONS: ChipOption[] = [
-  { value: '조용한 분위기', label: '조용한 분위기' },
-  { value: '활기찬 분위기', label: '활기찬 분위기' },
-  { value: '웰빙 & 휴식', label: '웰빙 & 휴식' },
-  { value: '모험적인', label: '모험적인' },
-  { value: '로맨틱한', label: '로맨틱한' },
-  { value: '트렌디한', label: '트렌디한' },
+  { value: '조용한 장소', label: '조용한 장소' },
+  { value: '인스타 감성', label: '인스타 감성' },
+  { value: '힐링 분위기', label: '힐링 분위기' },
+  { value: '겨식 있는', label: '겨식 있는' },
+  { value: '맛집 탐방', label: '맛집 탐방' },
 ];
 
-// 하고 싶은 활동
-export const ACTIVITY_OPTIONS: ChipOption[] = [
-  { value: '카페 투어', label: '☕ 카페 투어' },
-  { value: '식사하면서', label: '🍽️ 식사하면서' },
-  { value: '술이나 음료', label: '🍺 술이나 음료' },
-  { value: '스포츠/액티비티', label: '⚽ 스포츠/액티비티' },
-  { value: '문화/예술', label: '🎨 문화/예술' },
-  { value: '쇼핑', label: '🛍️ 쇼핑' },
+// 편의시설
+export const FACILITY_OPTIONS: ChipOption[] = [
+  { value: '주차 가능', label: '주차 가능' },
+  { value: '깨끗한 화장실', label: '깨끗한 화장실' },
+  { value: '콜키지 가능', label: '콜키지 가능' },
 ];
 
 export const MEETING_KEYWORDS = [

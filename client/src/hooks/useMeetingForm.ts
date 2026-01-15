@@ -6,9 +6,9 @@ export const useMeetingForm = () => {
     departure: '',
     destination: '',
     when: '',
-    placeCount: '',
-    mood: '',
-    activity: '',
+    foods: [],
+    moods: [],
+    facilities: [],
     additional: '',
   });
 
@@ -18,6 +18,13 @@ export const useMeetingForm = () => {
     setFormData((prev) => ({
       ...prev,
       [field]: value,
+    }));
+  };
+
+  const updateArrayField = (field: 'foods' | 'moods' | 'facilities', values: string[]) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: values,
     }));
   };
 
@@ -35,7 +42,7 @@ export const useMeetingForm = () => {
   };
 
   const validateStep2 = (): boolean => {
-    return !!(formData.placeCount && formData.mood && formData.activity);
+    return formData.foods.length > 0 || formData.moods.length > 0 || formData.facilities.length > 0;
   };
 
   const resetForm = () => {
@@ -43,9 +50,9 @@ export const useMeetingForm = () => {
       departure: '',
       destination: '',
       when: '',
-      placeCount: '',
-      mood: '',
-      activity: '',
+      foods: [],
+      moods: [],
+      facilities: [],
       additional: '',
     });
     setCurrentStep(1);
@@ -55,6 +62,7 @@ export const useMeetingForm = () => {
     formData,
     currentStep,
     updateField,
+    updateArrayField,
     goToStep2,
     goToStep1,
     validateStep2,

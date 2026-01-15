@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { TimeWheelPicker } from './TimeWheelPicker';
 
 interface DateRangePickerProps {
   value: string;
@@ -6,10 +7,12 @@ interface DateRangePickerProps {
 }
 
 export const DateRangePicker: React.FC<DateRangePickerProps> = ({ value, onChange }) => {
-  const [isOpen, setIsOpen] = useState(false);
   const [currentMonth, setCurrentMonth] = useState(new Date());
-  const [startDate, setStartDate] = useState<Date | null>(null);
-  const [endDate, setEndDate] = useState<Date | null>(null);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [isAllDay, setIsAllDay] = useState(true);
+  const [selectedHour, setSelectedHour] = useState(16); // Default 오후 4:00
+  const [selectedMinute, setSelectedMinute] = useState(0);
+  const [showTimePicker, setShowTimePicker] = useState(false);
 
   const getDaysInMonth = (date: Date) => {
     const year = date.getFullYear();
@@ -26,40 +29,64 @@ export const DateRangePicker: React.FC<DateRangePickerProps> = ({ value, onChang
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
+    return `${year}. ${parseInt(month)}. ${parseInt(day)}`;
   };
 
-  const formatDisplayDate = (dateStr: string) => {
-    if (!dateStr) return '날짜 선택';
-    const [start, end] = dateStr.split(' ~ ');
-    if (!end) return start;
-    return `${start} ~ ${end}`;
+  const formatTime = (hour: number, minute: number) => {
+    const period = hour >= 12 ? '오후' : '오전';
+    const displayHour = hour > 12 ? hour - 12 : hour === 0 ? 12 : hour;
+    return `${period} ${displayHour}:${String(minute).padStart(2, '0')}`;
+  };
+
+  const getDayOfWeek = (date: Date) => {
+    const days = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'];
+    return days[date.getDay()];
   };
 
   const handleDateClick = (day: number) => {
     const clickedDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
+    setSelectedDate(clickedDate);
 
-    if (!startDate || (startDate && endDate)) {
-      // Start new selection
-      setStartDate(clickedDate);
-      setEndDate(null);
+    // Update value
+    const dateStr = formatDate(clickedDate);
+    if (isAllDay) {
+      onChange(dateStr);
     } else {
-      // Set end date
-      if (clickedDate < startDate) {
-        setEndDate(startDate);
-        setStartDate(clickedDate);
+      onChange(`${dateStr} ${formatTime(selectedHour, selectedMinute)}`);
+    }
+  };
+
+  const handleTimeClick = () => {
+    if (!isAllDay) {
+      setShowTimePicker(true);
+    }
+  };
+
+  const handleTimeConfirm = () => {
+    setShowTimePicker(false);
+    if (selectedDate) {
+      const dateStr = formatDate(selectedDate);
+      if (isAllDay) {
+        onChange(dateStr);
       } else {
-        setEndDate(clickedDate);
+        onChange(`${dateStr} ${formatTime(selectedHour, selectedMinute)}`);
       }
     }
   };
 
-  const handleConfirm = () => {
-    if (startDate) {
-      const start = formatDate(startDate);
-      const end = endDate ? formatDate(endDate) : start;
-      onChange(endDate ? `${start} ~ ${end}` : start);
-      setIsOpen(false);
+  const handleAllDayToggle = () => {
+    const newAllDay = !isAllDay;
+    setIsAllDay(newAllDay);
+
+    if (selectedDate) {
+      const dateStr = formatDate(selectedDate);
+      if (newAllDay) {
+        // If all day is enabled, don't include time
+        onChange(dateStr);
+      } else {
+        // If all day is disabled, include time
+        onChange(`${dateStr} ${formatTime(selectedHour, selectedMinute)}`);
+      }
     }
   };
 
@@ -71,121 +98,123 @@ export const DateRangePicker: React.FC<DateRangePickerProps> = ({ value, onChang
     setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1));
   };
 
-  const isDateInRange = (day: number) => {
-    if (!startDate) return false;
+  const isSelectedDate = (day: number) => {
+    if (!selectedDate) return false;
     const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
-    if (!endDate) return date.getTime() === startDate.getTime();
-    return date >= startDate && date <= endDate;
-  };
-
-  const isStartDate = (day: number) => {
-    if (!startDate) return false;
-    const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
-    return date.getTime() === startDate.getTime();
-  };
-
-  const isEndDate = (day: number) => {
-    if (!endDate) return false;
-    const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
-    return date.getTime() === endDate.getTime();
+    return date.toDateString() === selectedDate.toDateString();
   };
 
   const { daysInMonth, startingDayOfWeek } = getDaysInMonth(currentMonth);
   const monthYear = `${currentMonth.getFullYear()}년 ${currentMonth.getMonth() + 1}월`;
 
   return (
-    <div className="relative">
-      {/* Display Button */}
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between px-4 py-3 border border-gray-300 rounded-lg hover:border-gray-400 transition-colors"
-      >
-        <span className="text-gray-700">{formatDisplayDate(value)}</span>
-        <svg
-          className="w-5 h-5 text-gray-500"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-          />
-        </svg>
-      </button>
-
-      {/* Calendar Dropdown */}
-      {isOpen && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-xl border border-gray-200 p-4 z-10">
-          {/* Month Navigation */}
-          <div className="flex items-center justify-between mb-4">
-            <button
-              onClick={previousMonth}
-              className="p-1 hover:bg-gray-100 rounded"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-            </button>
-            <span className="font-semibold text-gray-900">{monthYear}</span>
-            <button
-              onClick={nextMonth}
-              className="p-1 hover:bg-gray-100 rounded"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
-          </div>
-
-          {/* Weekday Headers */}
-          <div className="grid grid-cols-7 gap-1 mb-2">
-            {['일', '월', '화', '수', '목', '금', '토'].map((day) => (
-              <div key={day} className="text-center text-xs font-semibold text-gray-600 py-1">
-                {day}
-              </div>
-            ))}
-          </div>
-
-          {/* Calendar Days */}
-          <div className="grid grid-cols-7 gap-1">
-            {Array.from({ length: startingDayOfWeek }).map((_, index) => (
-              <div key={`empty-${index}`} />
-            ))}
-            {Array.from({ length: daysInMonth }).map((_, index) => {
-              const day = index + 1;
-              const inRange = isDateInRange(day);
-              const isStart = isStartDate(day);
-              const isEnd = isEndDate(day);
-
-              return (
-                <button
-                  key={day}
-                  onClick={() => handleDateClick(day)}
-                  className={`
-                    aspect-square flex items-center justify-center text-sm rounded-full
-                    ${inRange ? 'bg-kakao-yellow text-kakao-text font-semibold' : 'text-gray-700'}
-                    ${(isStart || isEnd) ? 'bg-kakao-yellow-dark' : ''}
-                    hover:bg-kakao-yellow/50 transition-colors
-                  `}
-                >
-                  {day}
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Confirm Button */}
+    <div className="bg-white rounded-lg border border-gray-200 p-4">
+      {/* Month Navigation */}
+      <div className="flex items-center justify-between mb-4">
+        <span className="text-xl font-bold text-gray-900">{monthYear}</span>
+        <div className="flex gap-2">
           <button
-            onClick={handleConfirm}
-            disabled={!startDate}
-            className="w-full mt-4 py-2.5 bg-kakao-yellow text-kakao-text rounded-lg font-semibold hover:bg-kakao-yellow-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            onClick={previousMonth}
+            className="p-1 hover:bg-gray-100 rounded"
           >
-            선택
+            <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+          <button
+            onClick={nextMonth}
+            className="p-1 hover:bg-gray-100 rounded"
+          >
+            <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
           </button>
         </div>
+      </div>
+
+      {/* Weekday Headers */}
+      <div className="grid grid-cols-7 gap-1 mb-2">
+        {['일', '월', '화', '수', '목', '금', '토'].map((day) => (
+          <div key={day} className="text-center text-sm font-medium text-gray-400 py-2">
+            {day}
+          </div>
+        ))}
+      </div>
+
+      {/* Calendar Days */}
+      <div className="grid grid-cols-7 gap-1 mb-4">
+        {Array.from({ length: startingDayOfWeek }).map((_, index) => (
+          <div key={`empty-${index}`} />
+        ))}
+        {Array.from({ length: daysInMonth }).map((_, index) => {
+          const day = index + 1;
+          const isSelected = isSelectedDate(day);
+
+          return (
+            <button
+              key={day}
+              onClick={() => handleDateClick(day)}
+              className={`
+                aspect-square flex items-center justify-center text-lg rounded-full
+                ${isSelected ? 'bg-blue-600 text-white font-bold' : 'text-gray-900'}
+                hover:bg-blue-100 transition-colors
+              `}
+            >
+              {day}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Hint Text */}
+      <p className="text-center text-sm text-blue-600 mb-4">
+        {selectedDate ? '' : '게일을 만들면 채팅방에 공유돼요'}
+      </p>
+
+      {/* Selected Date Display */}
+      {selectedDate && (
+        <div className="flex items-center justify-between py-3 border-t border-gray-200">
+          <span className="text-base text-gray-900">
+            {formatDate(selectedDate)}. {getDayOfWeek(selectedDate)}
+          </span>
+          {!isAllDay && (
+            <button
+              onClick={handleTimeClick}
+              className="text-base text-gray-900 hover:text-blue-600"
+            >
+              {formatTime(selectedHour, selectedMinute)}
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* All Day Toggle */}
+      <div className="flex items-center justify-between py-3 border-t border-gray-200">
+        <span className="text-base text-gray-900">하루 종일</span>
+        <button
+          onClick={handleAllDayToggle}
+          className={`relative w-12 h-6 rounded-full transition-colors ${
+            isAllDay ? 'bg-blue-600' : 'bg-gray-300'
+          }`}
+        >
+          <div
+            className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${
+              isAllDay ? 'left-6' : 'left-0.5'
+            }`}
+          />
+        </button>
+      </div>
+
+      {/* Time Picker Modal */}
+      {showTimePicker && (
+        <TimeWheelPicker
+          selectedHour={selectedHour}
+          selectedMinute={selectedMinute}
+          onHourChange={setSelectedHour}
+          onMinuteChange={setSelectedMinute}
+          onConfirm={handleTimeConfirm}
+          onClose={() => setShowTimePicker(false)}
+        />
       )}
     </div>
   );
