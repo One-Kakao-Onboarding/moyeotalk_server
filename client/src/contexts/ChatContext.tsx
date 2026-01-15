@@ -9,6 +9,7 @@ interface ChatContextType {
   isConnected: boolean;
   connect: (username: string) => void;
   sendMessage: (content: string) => void;
+  sendBotMessage: (content: string) => void;
   requestRecommendation: (meetingData: MeetingData) => void;
   confirmAppointment: (route: Route, meetingData: MeetingData, participants: string[]) => void;
   currentMeetingData: MeetingData | null;
@@ -32,6 +33,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children, username }
       isConnected: chat.isConnected,
       connect: chat.connect,
       sendMessage: chat.sendMessage,
+      sendBotMessage: chat.sendBotMessage,
       requestRecommendation: chat.requestRecommendation,
       confirmAppointment: chat.confirmAppointment,
       currentMeetingData: chat.currentMeetingData,
@@ -43,6 +45,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children, username }
       chat.isConnected,
       chat.connect,
       chat.sendMessage,
+      chat.sendBotMessage,
       chat.requestRecommendation,
       chat.confirmAppointment,
       chat.currentMeetingData,

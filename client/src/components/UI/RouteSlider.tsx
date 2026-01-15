@@ -6,13 +6,14 @@ interface RouteSliderProps {
   routes: Route[];
   onAccept: (route: Route) => void;
   onReject?: (route: Route) => void;
+  onRequestNew?: () => void;
   meetingData?: {
     when: string;
     destination: string;
   };
 }
 
-export const RouteSlider: React.FC<RouteSliderProps> = ({ routes, onAccept, onReject, meetingData }) => {
+export const RouteSlider: React.FC<RouteSliderProps> = ({ routes, onAccept, onReject, onRequestNew, meetingData }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const sliderRef = useRef<HTMLDivElement>(null);
 
@@ -98,6 +99,18 @@ export const RouteSlider: React.FC<RouteSliderProps> = ({ routes, onAccept, onRe
               aria-label={`경로 ${index + 1}로 이동`}
             />
           ))}
+        </div>
+      )}
+
+      {/* Request New Recommendations Button */}
+      {onRequestNew && (
+        <div className="px-4 mt-4">
+          <button
+            onClick={onRequestNew}
+            className="w-full py-3 bg-white text-gray-900 font-medium rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors text-sm"
+          >
+            새로운 추천 받기
+          </button>
         </div>
       )}
     </div>

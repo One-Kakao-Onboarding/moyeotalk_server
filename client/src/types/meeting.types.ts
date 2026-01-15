@@ -21,7 +21,7 @@ export interface Place {
   location: string;
   category?: string; // 예: "중식", "카페"
   distance?: string; // 예: "여기서 3.7km"
-  travelTime: string; // 예: "15분" (이전 장소에서의 소요 시간)
+  travelTime: string; // 예: "500m", "1.2km" (이전 장소에서의 거리)
   reason: string;
   emoji: string;
   images?: string[]; // 장소 이미지 URL 배열

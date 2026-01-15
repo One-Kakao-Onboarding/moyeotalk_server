@@ -23,10 +23,21 @@ export default {
         fadeIn: {
           from: { opacity: '0', transform: 'translateY(10px)' },
           to: { opacity: '1', transform: 'translateY(0)' }
+        },
+        confettiFall: {
+          '0%': {
+            transform: 'translateY(0) rotateZ(0deg)',
+            opacity: '1'
+          },
+          '100%': {
+            transform: 'translateY(100vh) rotateZ(360deg)',
+            opacity: '0'
+          }
         }
       },
       animation: {
-        'fade-in': 'fadeIn 0.3s ease-in'
+        'fade-in': 'fadeIn 0.3s ease-in',
+        'confetti-fall': 'confettiFall 0.6s ease-out forwards'
       }
     },
   },

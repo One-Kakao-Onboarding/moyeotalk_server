@@ -77,6 +77,19 @@ export const useChat = (username: string) => {
     [userCount, addMessage]
   );
 
+  const sendBotMessage = useCallback(
+    (content: string) => {
+      if (!isConnected || !content.trim()) return;
+
+      send({
+        type: 'bot_simple_message',
+        username: 'Kanana',
+        content,
+      });
+    },
+    [isConnected, send]
+  );
+
   // Subscribe to incoming messages
   useEffect(() => {
     const unsubscribe = subscribe((message) => {
@@ -119,6 +132,7 @@ export const useChat = (username: string) => {
     connect,
     disconnect,
     sendMessage,
+    sendBotMessage,
     requestRecommendation,
     confirmAppointment,
     currentMeetingData,

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { TimeWheelPicker } from './TimeWheelPicker';
 
 interface DateRangePickerProps {
@@ -7,12 +7,21 @@ interface DateRangePickerProps {
 }
 
 export const DateRangePicker: React.FC<DateRangePickerProps> = ({ value, onChange }) => {
-  const [currentMonth, setCurrentMonth] = useState(new Date());
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  // Default to January 17, 2026
+  const defaultDate = new Date(2026, 0, 17); // Month is 0-indexed (0 = January)
+  const [currentMonth, setCurrentMonth] = useState(defaultDate);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(defaultDate);
   const [isAllDay, setIsAllDay] = useState(true);
   const [selectedHour, setSelectedHour] = useState(16); // Default 오후 4:00
   const [selectedMinute, setSelectedMinute] = useState(0);
   const [showTimePicker, setShowTimePicker] = useState(false);
+
+  // Set initial value on mount
+  useEffect(() => {
+    if (!value && selectedDate) {
+      onChange(formatDate(selectedDate));
+    }
+  }, []);
 
   const getDaysInMonth = (date: Date) => {
     const year = date.getFullYear();
@@ -168,7 +177,7 @@ export const DateRangePicker: React.FC<DateRangePickerProps> = ({ value, onChang
 
       {/* Hint Text */}
       <p className="text-center text-sm text-blue-600 mb-4">
-        {selectedDate ? '' : '게일을 만들면 채팅방에 공유돼요'}
+        {selectedDate ? '' : '양식을 제출하면 채팅방에 공유돼요'}
       </p>
 
       {/* Selected Date Display */}

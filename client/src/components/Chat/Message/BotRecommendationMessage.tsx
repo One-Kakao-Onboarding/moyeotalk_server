@@ -41,6 +41,12 @@ export const BotRecommendationMessage: React.FC<BotRecommendationMessageProps> =
     sendMessage(rejectionMessage);
   };
 
+  const handleRequestNew = () => {
+    // Send request for new recommendations
+    const requestMessage = '새로운 추천 받고 싶어요!';
+    sendMessage(requestMessage);
+  };
+
   return (
     <div className="flex items-start mb-4 animate-fade-in">
       <ProfileAvatar username="Kanana" variant="kanana" />
@@ -56,6 +62,7 @@ export const BotRecommendationMessage: React.FC<BotRecommendationMessageProps> =
           routes={routes}
           onAccept={handleAcceptRoute}
           onReject={handleRejectRoute}
+          onRequestNew={handleRequestNew}
           meetingData={currentMeetingData ? {
             when: currentMeetingData.when,
             destination: currentMeetingData.destination

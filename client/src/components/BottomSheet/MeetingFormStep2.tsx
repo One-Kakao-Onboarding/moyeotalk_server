@@ -73,7 +73,7 @@ export const MeetingFormStep2: React.FC<MeetingFormStep2Props> = ({
 
       {/* 힌트 텍스트 */}
       <p className="text-center text-sm text-blue-600 mb-4">
-        게임을 만들면 <span className="text-blue-700 font-semibold">채팅방</span>에 공유돼요
+        양식을 제출하면 채팅방에 공유돼요
       </p>
 
       <Button variant="primary" onClick={onSubmit} disabled={!isValid} className="w-full">

@@ -128,7 +128,12 @@ export const MeetingFormStep1: React.FC<MeetingFormStep1Props> = ({
         />
       </div>
 
-      <Button variant="primary" onClick={onNext} disabled={!isValid} className="w-full mt-5">
+      {/* Hint Text */}
+      <p className="text-center text-sm text-blue-600 mt-6 mb-3">
+        양식을 제출하면 채팅방에 공유돼요
+      </p>
+
+      <Button variant="primary" onClick={onNext} disabled={!isValid} className="w-full">
         다음
       </Button>
 

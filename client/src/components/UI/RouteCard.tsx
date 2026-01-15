@@ -142,50 +142,46 @@ export const RouteCard: React.FC<RouteCardProps> = ({ route, onAccept, onReject,
 
       {/* Action Buttons */}
       <div className="flex gap-2">
-        <div className="flex-1 flex items-center gap-1.5">
-          <span className="text-xl">👍</span>
-          <button
-            onClick={() => onAccept(route)}
-            className="flex-1 py-2 bg-gray-100 hover:bg-gray-200 text-gray-900 font-medium rounded-lg transition-colors flex items-center justify-center gap-1.5 min-w-0"
-          >
-            <span className="text-xs whitespace-nowrap">좋아요</span>
-            {likes.length > 0 && (
-              <div className="flex -space-x-1.5">
-                {likes.map((user, idx) => (
-                  <div
-                    key={idx}
-                    className="w-5 h-5 rounded-full border-2 border-white flex items-center justify-center text-xs font-bold text-white flex-shrink-0"
-                    style={{ backgroundColor: userColors[user] || '#999' }}
-                  >
-                    {user.charAt(0).toUpperCase()}
-                  </div>
-                ))}
-              </div>
-            )}
-          </button>
-        </div>
-        <div className="flex-1 flex items-center gap-1.5">
-          <span className="text-xl">👎</span>
-          <button
-            onClick={() => onReject(route)}
-            className="flex-1 py-2 bg-gray-100 hover:bg-gray-200 text-gray-900 font-medium rounded-lg transition-colors flex items-center justify-center gap-1.5 min-w-0"
-          >
-            <span className="text-xs whitespace-nowrap">별로에요</span>
-            {dislikes.length > 0 && (
-              <div className="flex -space-x-1.5">
-                {dislikes.map((user, idx) => (
-                  <div
-                    key={idx}
-                    className="w-5 h-5 rounded-full border-2 border-white flex items-center justify-center text-xs font-bold text-white flex-shrink-0"
-                    style={{ backgroundColor: userColors[user] || '#999' }}
-                  >
-                    {user.charAt(0).toUpperCase()}
-                  </div>
-                ))}
-              </div>
-            )}
-          </button>
-        </div>
+        <button
+          onClick={() => onAccept(route)}
+          className="flex-1 py-2 bg-gray-100 hover:bg-gray-200 text-gray-900 font-medium rounded-lg transition-colors flex items-center justify-center gap-1 min-w-0"
+        >
+          <span className="text-base">👍</span>
+          <span className="text-xs whitespace-nowrap">좋아요</span>
+          {likes.length > 0 && (
+            <div className="flex -space-x-1">
+              {likes.map((user, idx) => (
+                <div
+                  key={idx}
+                  className="w-4 h-4 rounded-full border border-white flex items-center justify-center text-[10px] font-bold text-white flex-shrink-0"
+                  style={{ backgroundColor: userColors[user] || '#999' }}
+                >
+                  {user.charAt(0).toUpperCase()}
+                </div>
+              ))}
+            </div>
+          )}
+        </button>
+        <button
+          onClick={() => onReject(route)}
+          className="flex-1 py-2 bg-gray-100 hover:bg-gray-200 text-gray-900 font-medium rounded-lg transition-colors flex items-center justify-center gap-1 min-w-0"
+        >
+          <span className="text-base">👎</span>
+          <span className="text-xs whitespace-nowrap">별로에요</span>
+          {dislikes.length > 0 && (
+            <div className="flex -space-x-1">
+              {dislikes.map((user, idx) => (
+                <div
+                  key={idx}
+                  className="w-4 h-4 rounded-full border border-white flex items-center justify-center text-[10px] font-bold text-white flex-shrink-0"
+                  style={{ backgroundColor: userColors[user] || '#999' }}
+                >
+                  {user.charAt(0).toUpperCase()}
+                </div>
+              ))}
+            </div>
+          )}
+        </button>
       </div>
     </div>
   );

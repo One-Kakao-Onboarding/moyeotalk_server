@@ -136,7 +136,7 @@ async def get_place_recommendation(chat_history: List[dict], usernames: List[str
 [대화 내용]
 {chat_context}
 
-위 정보를 바탕으로 3가지 다른 경로(Route)를 추천해주세요. 각 경로는 2-3개의 장소로 구성됩니다.
+위 정보를 바탕으로 3가지 다른 경로(Route)를 추천해주세요. 각 경로는 정확히 2개의 장소로 구성됩니다.
 반드시 아래 JSON 형식으로만 답변해주세요:
 
 ```json
@@ -153,7 +153,7 @@ async def get_place_recommendation(chat_history: List[dict], usernames: List[str
           "location": "구체적인 주소",
           "category": "중식",
           "distance": "여기서 3.7km",
-          "travelTime": "15분",
+          "travelTime": "500m",
           "reason": "추천 이유 (구체적이고 상세하게)",
           "emoji": "🍽️"
         }},
@@ -163,7 +163,7 @@ async def get_place_recommendation(chat_history: List[dict], usernames: List[str
           "location": "구체적인 주소",
           "category": "카페",
           "distance": "여기서 500m",
-          "travelTime": "20분",
+          "travelTime": "800m",
           "reason": "추천 이유 (구체적이고 상세하게)",
           "emoji": "☕"
         }}
@@ -173,22 +173,29 @@ async def get_place_recommendation(chat_history: List[dict], usernames: List[str
       "routeId": 2,
       "title": "두 번째 경로 제목",
       "totalTime": "3시간",
-      "places": [...]
+      "places": [
+        {{"order": 1, "name": "...", "location": "...", "category": "...", "distance": "...", "travelTime": "...", "reason": "...", "emoji": "..."}},
+        {{"order": 2, "name": "...", "location": "...", "category": "...", "distance": "...", "travelTime": "...", "reason": "...", "emoji": "..."}}
+      ]
     }},
     {{
       "routeId": 3,
       "title": "세 번째 경로 제목",
       "totalTime": "2시간",
-      "places": [...]
+      "places": [
+        {{"order": 1, "name": "...", "location": "...", "category": "...", "distance": "...", "travelTime": "...", "reason": "...", "emoji": "..."}},
+        {{"order": 2, "name": "...", "location": "...", "category": "...", "distance": "...", "travelTime": "...", "reason": "...", "emoji": "..."}}
+      ]
     }}
   ]
 }}
 ```
 
 중요:
+- 각 경로는 정확히 2개의 장소만 포함합니다 (1차, 2차)
 - 각 경로는 출발지({departure})에서 시작합니다
-- travelTime은 이전 장소에서 해당 장소까지의 대중교통/도보 소요 시간입니다
-- 첫 번째 장소의 travelTime은 출발지에서의 소요 시간입니다
+- travelTime은 이전 장소에서 해당 장소까지의 거리입니다 (예: "500m", "1.2km", "800m")
+- 첫 번째 장소의 travelTime은 출발지에서의 거리입니다
 - category는 장소 카테고리 (예: "중식", "카페", "술집", "일식")
 - distance는 출발지로부터의 거리 (예: "여기서 3.7km", "여기서 500m")
 - reason은 카나나가 해당 장소를 추천하는 구체적인 이유 (2-3문장으로 상세하게)
@@ -296,6 +303,17 @@ async def websocket_endpoint(websocket: WebSocket, username: str):
                     "user_count": manager.get_user_count()
                 }
                 await manager.broadcast(recommendation_message)
+
+            # 봇 간단 메시지 처리
+            if message_data.get("type") == "bot_simple_message":
+                bot_message = {
+                    "type": "message",
+                    "username": "Kanana",
+                    "content": message_data.get("content", ""),
+                    "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                    "user_count": manager.get_user_count()
+                }
+                await manager.broadcast(bot_message)
 
     except WebSocketDisconnect:
         # 연결 해제
