@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>모여톡 채팅방</title>
+    <title>Kanana 채팅</title>
     <style>
         * {
             margin: 0;
@@ -31,7 +31,6 @@
             overflow: hidden;
         }
 
-        /* 헤더 스타일 */
         .header {
             background: #FEE500;
             border-bottom: 1px solid #E5D400;
@@ -69,7 +68,6 @@
         .header-right {
             display: flex;
             gap: 16px;
-            align-items: center;
         }
 
         .header-icon {
@@ -78,7 +76,6 @@
             cursor: pointer;
         }
 
-        /* 로그인 화면 */
         #login-screen {
             flex: 1;
             display: flex;
@@ -87,12 +84,6 @@
             align-items: center;
             padding: 40px 20px;
             background: white;
-        }
-
-        .login-container {
-            width: 100%;
-            max-width: 360px;
-            text-align: center;
         }
 
         .login-logo {
@@ -122,11 +113,6 @@
             margin-bottom: 12px;
         }
 
-        .login-form input:focus {
-            outline: none;
-            border-color: #FEE500;
-        }
-
         .login-form button {
             width: 100%;
             padding: 16px;
@@ -139,16 +125,12 @@
             cursor: pointer;
         }
 
-        .login-form button:hover {
-            background: #FDD835;
-        }
-
-        /* 채팅 화면 */
         #chat-screen {
             display: none;
             flex: 1;
             flex-direction: column;
             height: 100%;
+            position: relative;
         }
 
         #messages {
@@ -158,7 +140,6 @@
             background: #B2C7D9;
         }
 
-        /* 메시지 스타일 */
         .message {
             margin-bottom: 16px;
             animation: fadeIn 0.3s ease-in;
@@ -171,7 +152,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* 시스템 메시지 */
         .message.system-message {
             justify-content: center;
             margin: 20px 0;
@@ -185,21 +165,21 @@
             border-radius: 12px;
         }
 
-        /* 봇 프로필 */
-        .bot-profile {
+        .kanana-profile {
             width: 42px;
             height: 42px;
             border-radius: 50%;
-            background: #FEE500;
+            background: linear-gradient(135deg, #FF6B9D 0%, #C239B3 100%);
             display: flex;
             align-items: center;
             justify-content: center;
+            color: white;
             font-size: 20px;
+            font-weight: 600;
             margin-right: 8px;
             flex-shrink: 0;
         }
 
-        /* 봇 트리거 메시지 */
         .message.bot-trigger {
             flex-direction: row;
         }
@@ -226,62 +206,244 @@
             line-height: 1.4;
         }
 
-        .message.bot-trigger .action-button {
+        .message.bot-trigger .action-buttons {
+            display: flex;
+            gap: 8px;
             margin-top: 8px;
+        }
+
+        .message.bot-trigger .action-button {
+            flex: 1;
             padding: 10px 16px;
-            background: #FEE500;
-            color: #3C1E1E;
-            border: none;
+            background: white;
+            color: #333;
+            border: 1px solid #E5E5EA;
             border-radius: 8px;
             font-weight: 600;
             cursor: pointer;
             font-size: 14px;
         }
 
-        .message.bot-trigger .action-button:hover {
-            background: #FDD835;
+        .message.bot-trigger .action-button.primary {
+            background: #FEE500;
+            border-color: #FEE500;
+            color: #3C1E1E;
         }
 
-        /* 봇 추천 카드 */
-        .message.bot-recommendation {
-            flex-direction: row;
+        /* 바텀 시트 */
+        .bottom-sheet {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%) translateY(100%);
+            width: 100%;
+            max-width: 480px;
+            background: white;
+            border-radius: 20px 20px 0 0;
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+            max-height: 80vh;
+            overflow-y: auto;
         }
 
-        .message.bot-recommendation .message-wrapper {
-            display: flex;
-            flex-direction: column;
-            max-width: calc(100% - 50px);
+        .bottom-sheet.show {
+            transform: translateX(-50%) translateY(0);
         }
 
-        .message.bot-recommendation .username {
-            font-size: 13px;
+        .bottom-sheet-header {
+            padding: 20px;
+            border-bottom: 1px solid #E5E5EA;
+            text-align: center;
+            position: relative;
+        }
+
+        .bottom-sheet-title {
+            font-size: 18px;
             font-weight: 600;
             color: #333;
-            margin-bottom: 4px;
+        }
+
+        .bottom-sheet-close {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .bottom-sheet-content {
+            padding: 20px;
+        }
+
+        .step-content {
+            display: none;
+        }
+
+        .step-content.active {
+            display: block;
+        }
+
+        .form-section {
+            margin-bottom: 24px;
+        }
+
+        .form-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px;
+            font-size: 15px;
+            border: 1px solid #E5E5EA;
+            border-radius: 8px;
+            background: #F5F5F5;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #FEE500;
+            background: white;
+        }
+
+        .form-textarea {
+            width: 100%;
+            padding: 14px;
+            font-size: 15px;
+            border: 1px solid #E5E5EA;
+            border-radius: 8px;
+            background: #F5F5F5;
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .form-textarea:focus {
+            outline: none;
+            border-color: #FEE500;
+            background: white;
+        }
+
+        .chip-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .chip {
+            padding: 10px 20px;
+            background: #F5F5F5;
+            border: 1px solid #E5E5EA;
+            border-radius: 24px;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .chip.selected {
+            background: #3C1E1E;
+            color: white;
+            border-color: #3C1E1E;
+        }
+
+        .submit-button {
+            width: 100%;
+            padding: 16px;
+            background: #FEE500;
+            color: #3C1E1E;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        .submit-button:disabled {
+            background: #E5E5EA;
+            cursor: not-allowed;
+        }
+
+        /* 추천 카드 */
+        .message.bot-recommendation {
+            flex-direction: row;
+            align-items: flex-start;
+        }
+
+        .recommendation-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-width: calc(100% - 50px);
         }
 
         .recommendation-card {
             background: white;
-            border-radius: 12px;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-image {
+            width: 100%;
+            height: 160px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+        }
+
+        .card-content {
             padding: 16px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            max-width: 300px;
         }
 
-        .recommendation-card h3 {
+        .card-title {
             font-size: 16px;
-            margin-bottom: 12px;
+            font-weight: 600;
             color: #333;
+            margin-bottom: 8px;
         }
 
-        .recommendation-content {
+        .card-location {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 4px;
+        }
+
+        .card-description {
+            font-size: 13px;
+            color: #888;
+            line-height: 1.5;
+            margin-bottom: 12px;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .card-button {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #E5E5EA;
+            border-radius: 8px;
+            background: white;
             font-size: 14px;
-            line-height: 1.6;
-            color: #555;
-            white-space: pre-wrap;
+            cursor: pointer;
         }
 
-        /* 상대방 메시지 */
+        .card-button.primary {
+            background: #FEE500;
+            border-color: #FEE500;
+            font-weight: 600;
+        }
+
         .message.other-message {
             flex-direction: row;
         }
@@ -314,12 +476,6 @@
             margin-bottom: 4px;
         }
 
-        .message.other-message .message-row {
-            display: flex;
-            align-items: flex-end;
-            gap: 4px;
-        }
-
         .message.other-message .message-content {
             background: white;
             color: #333;
@@ -327,21 +483,16 @@
             border-radius: 4px 18px 18px 18px;
             font-size: 15px;
             line-height: 1.4;
-            word-wrap: break-word;
-            max-width: 260px;
         }
 
         .message.other-message .timestamp {
             font-size: 11px;
             color: rgba(0, 0, 0, 0.4);
-            white-space: nowrap;
-            align-self: flex-end;
+            margin-top: 4px;
         }
 
-        /* 내 메시지 */
         .message.my-message {
             flex-direction: row-reverse;
-            justify-content: flex-start;
         }
 
         .message.my-message .message-row {
@@ -358,17 +509,14 @@
             border-radius: 18px 4px 18px 18px;
             font-size: 15px;
             line-height: 1.4;
-            word-wrap: break-word;
             max-width: 260px;
         }
 
         .message.my-message .timestamp {
             font-size: 11px;
             color: rgba(0, 0, 0, 0.4);
-            white-space: nowrap;
         }
 
-        /* 입력 영역 */
         #input-area {
             display: flex;
             padding: 10px 16px;
@@ -390,7 +538,6 @@
             cursor: pointer;
             font-size: 20px;
             color: #666;
-            flex-shrink: 0;
         }
 
         #message-input {
@@ -400,14 +547,6 @@
             border: 1px solid #E5E5EA;
             border-radius: 20px;
             background: #F5F5F5;
-            resize: none;
-            min-height: 38px;
-        }
-
-        #message-input:focus {
-            outline: none;
-            background: white;
-            border-color: #FEE500;
         }
 
         #send-button {
@@ -422,7 +561,6 @@
             cursor: pointer;
             font-size: 18px;
             color: #666;
-            flex-shrink: 0;
         }
 
         #send-button.active {
@@ -430,12 +568,13 @@
             color: #3C1E1E;
         }
 
-        /* 스크롤바 */
-        #messages::-webkit-scrollbar {
+        #messages::-webkit-scrollbar,
+        .bottom-sheet::-webkit-scrollbar {
             width: 6px;
         }
 
-        #messages::-webkit-scrollbar-thumb {
+        #messages::-webkit-scrollbar-thumb,
+        .bottom-sheet::-webkit-scrollbar-thumb {
             background: rgba(0, 0, 0, 0.2);
             border-radius: 3px;
         }
@@ -447,7 +586,7 @@
             <div class="header-left">
                 <span class="back-button">←</span>
                 <div>
-                    <div class="header-title">모여톡</div>
+                    <div class="header-title">Kanana</div>
                     <div class="user-count" id="user-count">접속자 0명</div>
                 </div>
             </div>
@@ -457,11 +596,10 @@
             </div>
         </div>
 
-        <!-- 로그인 화면 -->
         <div id="login-screen">
-            <div class="login-container">
+            <div style="max-width: 360px; text-align: center;">
                 <div class="login-logo">💬</div>
-                <h2>모여톡 채팅방</h2>
+                <h2>Kanana 채팅방</h2>
                 <p class="login-subtitle">닉네임을 입력하고 채팅을 시작하세요</p>
                 <div class="login-form">
                     <input type="text" id="username-input" placeholder="닉네임 입력" maxlength="20" autocomplete="off">
@@ -470,7 +608,6 @@
             </div>
         </div>
 
-        <!-- 채팅 화면 -->
         <div id="chat-screen">
             <div id="messages"></div>
             <div id="input-area">
@@ -479,27 +616,93 @@
                 <button id="send-button" onclick="sendMessage()">▶</button>
             </div>
         </div>
+
+        <!-- 바텀 시트 -->
+        <div class="bottom-sheet" id="conditionSheet">
+            <div class="bottom-sheet-header">
+                <h3 class="bottom-sheet-title" id="sheetTitle">언제, 어디서 만날까요?</h3>
+                <span class="bottom-sheet-close" onclick="closeConditionSheet()">×</span>
+            </div>
+            <div class="bottom-sheet-content">
+                <!-- Step 1: 언제, 어디서 만날까요? -->
+                <div class="step-content active" id="step1">
+                    <div class="form-section">
+                        <label class="form-label">출발하는 곳</label>
+                        <input type="text" class="form-input" id="departure" placeholder="예: 강남역, 집, 회사 등">
+                    </div>
+
+                    <div class="form-section">
+                        <label class="form-label">만나고 싶은 곳</label>
+                        <input type="text" class="form-input" id="destination" placeholder="예: 홍대, 신촌, 이태원 등">
+                    </div>
+
+                    <div class="form-section">
+                        <label class="form-label">만나고 싶을 때</label>
+                        <div class="chip-group">
+                            <div class="chip" data-type="when" data-value="오늘">오늘</div>
+                            <div class="chip" data-type="when" data-value="내일">내일</div>
+                            <div class="chip" data-type="when" data-value="이번 주말">이번 주말</div>
+                            <div class="chip" data-type="when" data-value="다음 주">다음 주</div>
+                        </div>
+                    </div>
+
+                    <button class="submit-button" onclick="goToStep2()">다음</button>
+                </div>
+
+                <!-- Step 2: 어떤 만남이 되면 좋겠어요? -->
+                <div class="step-content" id="step2">
+                    <div class="form-section">
+                        <label class="form-label">어떤 분위기를 원하시나요?</label>
+                        <div class="chip-group">
+                            <div class="chip" data-type="mood" data-value="조용한">조용한</div>
+                            <div class="chip" data-type="mood" data-value="활기찬">활기찬</div>
+                            <div class="chip" data-type="mood" data-value="아늑한">아늑한</div>
+                            <div class="chip" data-type="mood" data-value="모던한">모던한</div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <label class="form-label">무엇을 하고 싶으세요?</label>
+                        <div class="chip-group">
+                            <div class="chip" data-type="activity" data-value="식사">식사</div>
+                            <div class="chip" data-type="activity" data-value="커피">커피</div>
+                            <div class="chip" data-type="activity" data-value="술">술</div>
+                            <div class="chip" data-type="activity" data-value="디저트">디저트</div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <label class="form-label">추가적으로 고려해야 할 점이 있나요?</label>
+                        <textarea class="form-textarea" id="additional" placeholder="예: 주차 가능한 곳, 룸이 있는 곳, 조용한 곳 등"></textarea>
+                    </div>
+
+                    <button class="submit-button" onclick="submitConditions()">장소 추천 받기</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
         let ws = null;
         let username = "";
+        let meetingData = {
+            departure: "",
+            destination: "",
+            when: "",
+            mood: "",
+            activity: "",
+            additional: ""
+        };
 
         const messageInput = document.getElementById("message-input");
         const sendButton = document.getElementById("send-button");
 
         messageInput.addEventListener("input", function() {
-            if (this.value.trim() !== "") {
-                sendButton.classList.add("active");
-            } else {
-                sendButton.classList.remove("active");
-            }
+            sendButton.classList.toggle("active", this.value.trim() !== "");
         });
 
         document.getElementById("username-input").addEventListener("keypress", function(event) {
-            if (event.key === "Enter") {
-                joinChat();
-            }
+            if (event.key === "Enter") joinChat();
         });
 
         messageInput.addEventListener("keypress", function(event) {
@@ -507,6 +710,21 @@
                 event.preventDefault();
                 sendMessage();
             }
+        });
+
+        // 칩 선택
+        document.querySelectorAll('.chip').forEach(chip => {
+            chip.addEventListener('click', function() {
+                const type = this.dataset.type;
+                const value = this.dataset.value;
+
+                document.querySelectorAll(`.chip[data-type="${type}"]`).forEach(c => {
+                    c.classList.remove('selected');
+                });
+
+                this.classList.add('selected');
+                meetingData[type] = value;
+            });
         });
 
         function joinChat() {
@@ -541,7 +759,6 @@
             };
 
             ws.onclose = function() {
-                console.log("WebSocket connection closed");
                 alert("서버와의 연결이 끊어졌습니다.");
                 location.reload();
             };
@@ -549,32 +766,59 @@
 
         function sendMessage() {
             const content = messageInput.value.trim();
+            if (content === "" || !ws || ws.readyState !== WebSocket.OPEN) return;
 
-            if (content === "") {
+            ws.send(JSON.stringify({
+                type: "message",
+                username: username,
+                content: content
+            }));
+            messageInput.value = "";
+            sendButton.classList.remove("active");
+            messageInput.focus();
+        }
+
+        function showConditionSheet() {
+            document.getElementById('conditionSheet').classList.add('show');
+        }
+
+        function closeConditionSheet() {
+            document.getElementById('conditionSheet').classList.remove('show');
+            // 리셋
+            document.getElementById('step1').classList.add('active');
+            document.getElementById('step2').classList.remove('active');
+            document.getElementById('sheetTitle').textContent = '언제, 어디서 만날까요?';
+        }
+
+        function goToStep2() {
+            meetingData.departure = document.getElementById('departure').value.trim();
+            meetingData.destination = document.getElementById('destination').value.trim();
+
+            if (!meetingData.departure || !meetingData.destination || !meetingData.when) {
+                alert("모든 항목을 입력해주세요!");
                 return;
             }
 
-            if (ws && ws.readyState === WebSocket.OPEN) {
-                const message = {
-                    type: "message",
-                    username: username,
-                    content: content
-                };
-
-                ws.send(JSON.stringify(message));
-                messageInput.value = "";
-                sendButton.classList.remove("active");
-                messageInput.focus();
-            }
+            document.getElementById('step1').classList.remove('active');
+            document.getElementById('step2').classList.add('active');
+            document.getElementById('sheetTitle').textContent = '어떤 만남이 되면 좋겠어요?';
         }
 
-        function requestRecommendation() {
+        function submitConditions() {
+            if (!meetingData.mood || !meetingData.activity) {
+                alert("분위기와 활동을 선택해주세요!");
+                return;
+            }
+
+            meetingData.additional = document.getElementById('additional').value.trim();
+            closeConditionSheet();
+
             if (ws && ws.readyState === WebSocket.OPEN) {
-                const message = {
+                ws.send(JSON.stringify({
                     type: "request_recommendation",
-                    username: username
-                };
-                ws.send(JSON.stringify(message));
+                    username: username,
+                    meetingData: meetingData
+                }));
             }
         }
 
@@ -584,46 +828,52 @@
 
             if (message.type === "system") {
                 messageDiv.className = "message system-message";
-                messageDiv.innerHTML = `
-                    <div class="message-content">${escapeHtml(message.content)}</div>
-                `;
+                messageDiv.innerHTML = `<div class="message-content">${escapeHtml(message.content)}</div>`;
             } else if (message.type === "bot_trigger") {
                 messageDiv.className = "message bot-trigger";
                 messageDiv.innerHTML = `
-                    <div class="bot-profile">🤖</div>
+                    <div class="kanana-profile">K</div>
                     <div class="message-wrapper">
-                        <div class="username">모여톡 AI</div>
-                        <div class="message-content">
-                            ${escapeHtml(message.content)}
+                        <div class="username">Kanana</div>
+                        <div class="message-content">${escapeHtml(message.content)}</div>
+                        <div class="action-buttons">
+                            <button class="action-button">괜찮아요</button>
+                            <button class="action-button primary" onclick="showConditionSheet()">네, 추천해주세요!</button>
                         </div>
-                        <button class="action-button" onclick="requestRecommendation()">
-                            네, 추천해주세요!
-                        </button>
                     </div>
                 `;
             } else if (message.type === "bot_loading") {
                 messageDiv.className = "message bot-trigger";
                 messageDiv.innerHTML = `
-                    <div class="bot-profile">🤖</div>
+                    <div class="kanana-profile">K</div>
                     <div class="message-wrapper">
-                        <div class="username">모여톡 AI</div>
-                        <div class="message-content">
-                            ${escapeHtml(message.content)}
-                        </div>
+                        <div class="username">Kanana</div>
+                        <div class="message-content">${escapeHtml(message.content)}</div>
                     </div>
                 `;
             } else if (message.type === "bot_recommendation") {
                 messageDiv.className = "message bot-recommendation";
-                messageDiv.innerHTML = `
-                    <div class="bot-profile">🤖</div>
-                    <div class="message-wrapper">
-                        <div class="username">모여톡 AI</div>
+                const recommendations = parseRecommendations(message.content);
+
+                let cardsHTML = '<div class="kanana-profile">K</div><div class="recommendation-cards">';
+                recommendations.forEach(rec => {
+                    cardsHTML += `
                         <div class="recommendation-card">
-                            <h3>🎯 AI 추천 결과</h3>
-                            <div class="recommendation-content">${escapeHtml(message.content)}</div>
+                            <div class="card-image">${rec.emoji || '🍽️'}</div>
+                            <div class="card-content">
+                                <div class="card-title">${escapeHtml(rec.name)}</div>
+                                <div class="card-location">📍 ${escapeHtml(rec.location)}</div>
+                                <div class="card-description">${escapeHtml(rec.reason)}</div>
+                                <div class="card-actions">
+                                    <button class="card-button">공유하기</button>
+                                    <button class="card-button primary">특별히 추천하기</button>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                `;
+                    `;
+                });
+                cardsHTML += '</div>';
+                messageDiv.innerHTML = cardsHTML;
             } else {
                 const isMyMessage = message.username === username;
                 messageDiv.className = isMyMessage ? "message my-message" : "message other-message";
@@ -641,10 +891,8 @@
                         <div class="profile">${initial}</div>
                         <div class="message-wrapper">
                             <div class="username">${escapeHtml(message.username)}</div>
-                            <div class="message-row">
-                                <div class="message-content">${escapeHtml(message.content)}</div>
-                                <div class="timestamp">${formatTime(message.timestamp)}</div>
-                            </div>
+                            <div class="message-content">${escapeHtml(message.content)}</div>
+                            <div class="timestamp">${formatTime(message.timestamp)}</div>
                         </div>
                     `;
                 }
@@ -652,6 +900,33 @@
 
             messagesDiv.appendChild(messageDiv);
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        function parseRecommendations(text) {
+            const recommendations = [];
+            const lines = text.split('\n');
+            let currentRec = null;
+
+            lines.forEach(line => {
+                if (line.match(/^\d+\./)) {
+                    if (currentRec) recommendations.push(currentRec);
+                    currentRec = { name: line.replace(/^\d+\.\s*/, ''), location: '강남역', reason: '', emoji: '🍽️' };
+                } else if (currentRec && line.trim()) {
+                    currentRec.reason += line + ' ';
+                }
+            });
+
+            if (currentRec) recommendations.push(currentRec);
+
+            if (recommendations.length === 0) {
+                return [
+                    { name: '추천 장소 1', location: '강남역', reason: text.substring(0, 100), emoji: '🍽️' },
+                    { name: '추천 장소 2', location: '역삼역', reason: text.substring(100, 200), emoji: '☕' },
+                    { name: '추천 장소 3', location: '선릉역', reason: text.substring(200, 300), emoji: '🍺' }
+                ];
+            }
+
+            return recommendations.slice(0, 3);
         }
 
         function updateUserCount(count) {

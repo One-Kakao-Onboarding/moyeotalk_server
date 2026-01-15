@@ -30,7 +30,8 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 if GEMINI_API_KEY and GEMINI_API_KEY != "your_gemini_api_key_here":
     genai.configure(api_key=GEMINI_API_KEY)
-    model = genai.GenerativeModel('gemini-1.5-flash')
+    # 최신 Gemini 모델 사용 (gemini-flash-latest 또는 gemini-2.0-flash)
+    model = genai.GenerativeModel("gemini-2.0-flash-exp")
 else:
     model = None
     print("⚠️ Gemini API 키가 설정되지 않았습니다. .env 파일을 확인해주세요.")
@@ -94,7 +95,7 @@ def detect_meeting_keywords(message: str) -> bool:
     ]
     return any(keyword in message for keyword in keywords)
 
-async def get_place_recommendation(chat_history: List[dict], usernames: List[str]) -> str:
+async def get_place_recommendation(chat_history: List[dict], usernames: List[str], meeting_data: dict = None) -> str:
     """Gemini API를 사용하여 장소 추천"""
     if not model:
         return "Gemini API가 설정되지 않아 추천을 제공할 수 없습니다. .env 파일에 GEMINI_API_KEY를 설정해주세요."
@@ -109,8 +110,40 @@ async def get_place_recommendation(chat_history: List[dict], usernames: List[str
 
         participants = ", ".join(usernames)
 
-        prompt = f"""
-당신은 '모여톡' AI 약속 어시스턴트입니다. 카카오톡 채팅방에서 친구들의 대화를 분석하여 최적의 만남 장소를 추천합니다.
+        # meetingData 정보 추출
+        if meeting_data:
+            departure = meeting_data.get('departure', '미입력')
+            destination = meeting_data.get('destination', '미입력')
+            when = meeting_data.get('when', '미입력')
+            mood = meeting_data.get('mood', '미입력')
+            activity = meeting_data.get('activity', '미입력')
+            additional = meeting_data.get('additional', '없음')
+
+            prompt = f"""
+당신은 'Kanana' AI 약속 어시스턴트입니다. 친구들의 만남을 위한 최적의 장소를 추천합니다.
+
+[참여자 정보]
+- 참여자: {participants}
+- 출발 지점: {departure}
+- 만나고 싶은 곳: {destination}
+- 만나는 시간: {when}
+- 원하는 분위기: {mood}
+- 하고 싶은 활동: {activity}
+- 추가 고려사항: {additional}
+
+[대화 내용]
+{chat_context}
+
+위 정보를 종합하여 최적의 만남 장소 3곳을 추천해주세요:
+1. 장소명과 위치 (구체적으로)
+2. 해당 장소가 적합한 이유 (출발 지점, 분위기, 활동 등을 고려)
+3. 추천 시간대나 예약 팁 (있다면)
+
+답변은 친근하고 캐주얼한 카카오톡 말투로 작성해주세요. 이모지도 적절히 사용해주세요!
+"""
+        else:
+            prompt = f"""
+당신은 'Kanana' AI 약속 어시스턴트입니다. 카카오톡 채팅방에서 친구들의 대화를 분석하여 최적의 만남 장소를 추천합니다.
 
 [참여자]
 {participants}
@@ -175,7 +208,7 @@ async def websocket_endpoint(websocket: WebSocket, username: str):
                     # AI 추천 트리거 메시지
                     bot_trigger = {
                         "type": "bot_trigger",
-                        "username": "모여톡 AI",
+                        "username": "Kanana",
                         "content": "약속 잡으시는 거 같은데, 제가 장소 추천해드릴까요? 👋",
                         "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                         "user_count": manager.get_user_count()
@@ -187,21 +220,22 @@ async def websocket_endpoint(websocket: WebSocket, username: str):
                 # 추천 생성 중 메시지
                 loading_message = {
                     "type": "bot_loading",
-                    "username": "모여톡 AI",
+                    "username": "Kanana",
                     "content": "장소를 추천하고 있어요... 🤔",
                     "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                     "user_count": manager.get_user_count()
                 }
                 await manager.broadcast(loading_message)
 
-                # Gemini API로 장소 추천
+                # Gemini API로 장소 추천 (meetingData 포함)
                 usernames = manager.get_usernames()
-                recommendation = await get_place_recommendation(chat_history, usernames)
+                meeting_data = message_data.get("meetingData", None)
+                recommendation = await get_place_recommendation(chat_history, usernames, meeting_data)
 
                 # 추천 결과 전송
                 recommendation_message = {
                     "type": "bot_recommendation",
-                    "username": "모여톡 AI",
+                    "username": "Kanana",
                     "content": recommendation,
                     "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                     "user_count": manager.get_user_count()
