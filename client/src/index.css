@@ -1,0 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .message-bubble-left {
+    @apply rounded-[4px_18px_18px_18px];
+  }
+
+  .message-bubble-right {
+    @apply rounded-[18px_4px_18px_18px];
+  }
+
+  .scrollbar-thin {
+    scrollbar-width: thin;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    @apply bg-black/20 rounded;
+  }
+}
